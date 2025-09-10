@@ -3,61 +3,67 @@ program DTR
 !Dicision Tree Regressor
 !1.PARAMETER SETTING
 !!!!!!!!!!
-
 implicit none
 
-!data number
-integer, parameter :: nmax = 400
-
-!raw number(last raw must be objective)
-integer, parameter :: mmax = 13
+!data & variable number(last variable must be objective)
+integer, parameter :: nmax = 15
+integer, parameter :: mmax = 6
 
 !exit criteria(data number by leaf)
 integer, parameter :: min = 2
 
 !max layer number
-integer, parameter :: layermax = 16
+integer, parameter :: layermax = 5
 
 !!!KOKOMADE
-
-real, allocatable :: y(:)
-integer, allocatable :: a(:)
-real, allocatable :: z(:,:,:)
+integer n
 real, allocatable :: x(:,:)
-real, allocatable :: x_1(:,:)
-integer, allocatable :: b(:)
-real, allocatable :: c(:)
-real, allocatable :: d(:)
-integer, allocatable :: e(:)
 
-integer rightnum, leftnum
-real right_div, left_div, right_ave, left_ave
-real right, left
-integer i, j, k, l, lmax, minnumber, sign, sign_obj
-integer m, n, p, q, r, s, pmax, layer
-real buf, score, threshold, scoremin
-
-lmax = 2**layermax
-
-allocate (z(1:lmax,1:nmax,1:mmax))
-allocate (a(1:nmax))
 allocate (x(1:nmax,1:mmax))
-allocate (b(1:lmax))
-allocate (c(1:lmax))
-allocate (d(1:lmax))
-allocate (e(1:lmax))
 
 !2.DATA READING
 !!!!!!!!!!
-open(80,file = 'BostonHousing_train.csv')
+open(80,file = 'train_data.csv')
 read(80, '()')
 do n = 1, nmax
 	read(80,*) x(n,:)
 end do
 close(80)
 
+call DTR_TRAIN(x, nmax, mmax, min, layermax)
+
+deallocate (x)
+end program DTR
+
 !3.MACHINE LEARNING (MAIN1)
 !!!!!!!!!!
+subroutine DTR_TRAIN(x, nmax, mmax, min, layermax)
+
+implicit none
+real x(1:nmax,1:mmax)
+integer nmax, mmax, min, layermax
+integer rightnum, leftnum
+real right_div, left_div, right_ave, left_ave
+real right, left
+integer i, j, k, l, lmax, minnumber, sign, sign_obj
+integer m, p, q, r, pmax, layer
+real buf, score, threshold, scoremin
+
+real, allocatable :: y(:)
+real, allocatable :: z(:,:,:)
+real, allocatable :: x_1(:,:)
+integer, allocatable :: b(:)
+real, allocatable :: c(:)
+real, allocatable :: d(:)
+integer, allocatable :: e(:)
+
+lmax = 2**layermax
+
+allocate (z(1:lmax,1:nmax,1:mmax))
+allocate (b(1:lmax))
+allocate (c(1:lmax))
+allocate (d(1:lmax))
+allocate (e(1:lmax))
 
 !initialize
 b(1) = 0
@@ -170,7 +176,8 @@ end do
 !not make leaf(all same value or category)
 sign_obj = 0
 do i = 1, pmax-1
-	if(y(i) /= y(i+1))then
+	if(y(i) == y(i+1))then
+	else
 	sign_obj = 1
 	end if
 end do
@@ -226,7 +233,7 @@ open(100,file = 'model.txt')
 open(110,file = 'check.txt')
 write(100,*) 'leaf, ','category(0 means stop), ','threshold, ','value(predict), ','data_number'
 do layer = 1, layermax
-	write(110,*)"layer=", layer
+	write(110,*)'layer=', layer
 	write(110,*) 'leaf, ','category(0 means stop), ','threshold, ','value(predict), ','data_number'
 	do l = 2**(layer -1), 2**layer -1
 		write(100,*) l, b(l), c(l), d(l), e(l)
@@ -239,13 +246,9 @@ close(100)
 close(110)
 
 deallocate (z)
-deallocate (a)
-deallocate (x)
 deallocate (b)
 deallocate (c)
 deallocate (d)
 deallocate (e)
 
-
-
-end program DTR
+end subroutine DTR_TRAIN
