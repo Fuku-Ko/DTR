@@ -6,17 +6,15 @@ program DTRmodel
 
 implicit none
 
-!data number
-integer, parameter :: nmax = 106
-
-!raw number(last raw must be objective)
-integer, parameter :: mmax = 13
+!data & variable number(last variable must be objective)
+integer, parameter :: nmax = 15
+integer, parameter :: mmax = 6
 
 !exit criteria(data number by leaf)
 integer, parameter :: min = 2
 
 !max layer number
-integer, parameter :: layermax = 16
+integer, parameter :: layermax = 5
 
 !!!KOKOMADE
 
