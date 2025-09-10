@@ -41,7 +41,7 @@ allocate (e(1:lmax))
 
 !2.DATA READING
 !!!!!!!!!!
-open(80,file = 'BostonHousing_test.csv')
+open(80,file = 'test_data.csv')
 read(80, '()')
 do n = 1, nmax
 	read(80,*) x(n,:)
